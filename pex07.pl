@@ -1,11 +1,101 @@
 % pex5.pl
 % USAFA UFO Sightings 2024
 %
-% name: 
+% name: C1C Eric Olsen
 %
-% Documentation: 
+% Documentation: I used https://stackoverflow.com/questions/13506569/prolog-or-operator-query for understanding how the OR operator worked in Prolog(line 70) and HW7.
 %
+% 'It's a UFO", PEX 7
+% tie -> UFO
+ufo(weather_balloon).
+ufo(kite).
+ufo(fighter_aircraft).
+ufo(cloud).
+%mr -> cadet
+cadet(smith).
+cadet(garcia).
+cadet(chen).
+cadet(jones).
+%relative ->day
+day(tuesday).
+day(wednesday).
+day(thursday).
+day(friday).
 
+%C4C Smith did not see a weather balloon, nor kite. - IMPLEMENTED
+% The one who saw the kite isn’t C4C Garcia. - IMPLEMENTED
+% Friday’s sighting was made by either C4C Chen or the one who saw the fighter aircraft.-IMPLEMENTED
+% The kite was not sighted on Tuesday. - IMPLEMENTED
+% Neither C4C Garcia nor C4C Jones saw the weather balloon.-IMPLEMENTED
+% C4C Jones did not make their sighting on Tuesday.-IMPLEMENTED
+% C4C Smith saw an object that turned out to be a cloud.-IMPLEMENTED
+% The fighter aircraft was spotted on Friday.-IMPLEMENTED
+% The weather balloon was not spotted on Wednesday.-IMPLEMENTED
+solve :-
+    ufo(SmithUFO), ufo(GarciaUFO), ufo(ChenUFO), ufo(JonesUFO),
+    all_different([SmithUFO, GarciaUFO, ChenUFO, JonesUFO]),
+    
+    day(SmithDay), day(GarciaDay),
+    day(ChenDay), day(JonesDay),
+    all_different([SmithDay, GarciaDay, ChenDay, JonesDay]),
+    
+    Triples = [ [smith,SmithUFO, SmithDay],
+                [garcia, GarciaUFO, GarciaDay],
+                [chen, ChenUFO, ChenDay],
+                [jones, JonesUFO, JonesDay] ],
+    
+    % 1. The tie with the grinning leprechauns wasn't a present from a daughter.
+    % The kite was not sighted on Tuesday.
+    \+ member([_, kite, tuesday], Triples),
+    
+    % 2. Mr. Crow's tie features neither the dancing reindeer not the yellow fappy faces.
+    %C4C Smith did not see a weather balloon, nor kite.
+    \+ member([smith, weather_balloon, _], Triples),
+    \+ member([smith, kite, _], Triples),
+    
+    % 3. Mr. Speighler's tie wasn't a present from his uncle.
+    % C4C Jones did not make their sighting on Tuesday.
+    \+ member([jones, _, tuesday], Triples),
+    
+    % The one who saw the kite isn’t C4C Garcia.
+    \+ member([garcia, kite, _], Triples),
+    
+    % 4. The tie with the yellow happy faces wasn't a gift from a sister.
+    % The weather balloon was not spotted on Wednesday.
+    \+ member([_, weather_balloon, wednesday], Triples),
+    
+    % 5. Mr. Evans and Mr. Speigler own the tie with the grinning leprechauns
+    % and the tie that was a present from a father-in-law, in some order.
+    % Friday’s sighting was made by either C4C Chen or the one who saw the fighter aircraft.
+    ( (member([_, fighter_aircraft, friday], Triples);
+     	member([chen, _, friday], Triples))),
+       %(member([chen, _, friday], Triples),
+       %	member([_, fighter_aircraft, friday], Triples))  ),
+    
+    % C4C Smith saw an object that turned out to be a cloud
+    member([smith, cloud, _], Triples),
+    
+    % Neither C4C Garcia nor C4C Jones saw the weather balloon.
+    \+ member([garcia, weather_balloon, _], Triples),
+    \+ member([jones, weather_balloon, _], Triples),
+    
+    % The fighter aircraft was spotted on Friday.
+    member([_, fighter_aircraft, friday], Triples),
+    
+    tell(smith, SmithUFO, SmithDay),
+    tell(garcia, GarciaUFO, GarciaDay),
+    tell(chen, ChenUFO, ChenDay),
+    tell(jones, JonesUFO, JonesDay).
+
+% Succeeds if all elements of the argument list are bound and different.
+% Fails if any elements are unbound or equal to some other element.
+all_different([H | T]) :- member(H, T), !, fail.
+all_different([_ | T]) :- all_different(T).
+all_different([_]).
+
+tell(X, Y, Z) :-
+    write('C4C '), write(X), write(' saw the '), write(Y),
+    write(' on '), write(Z), write('.'), nl.
 % The query to get the answer(s) or that there is no answer
 % ?- solve.
 
